@@ -39,10 +39,12 @@ class _PortfolioHomeState extends State<PortfolioHome>
   final ScrollController _scrollController = ScrollController();
   late AnimationController _heroAnimController;
   late AnimationController _fadeController;
+  final List<double> sectionOffsets = [0, 800, 1600, 2400, 3200, 4700];
 
   @override
   void initState() {
     super.initState();
+
     _heroAnimController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
@@ -52,6 +54,25 @@ class _PortfolioHomeState extends State<PortfolioHome>
       vsync: this,
       duration: const Duration(milliseconds: 800),
     )..forward();
+
+    _scrollController.addListener(() {
+      double scrollPos = _scrollController.offset;
+
+      // Find the current section based on scroll position
+      for (int i = 0; i < sectionOffsets.length; i++) {
+        double start = sectionOffsets[i];
+        double end = (i + 1 < sectionOffsets.length) ? sectionOffsets[i + 1] : double.infinity;
+
+        if (scrollPos >= start && scrollPos < end) {
+          if (selectedIndex != i) {
+            setState(() {
+              selectedIndex = i;
+            });
+          }
+          break;
+        }
+      }
+    });
   }
 
   void _scrollToSection(double offset) {
@@ -125,11 +146,11 @@ class _PortfolioHomeState extends State<PortfolioHome>
             ),
             Row(
               children: [
-                _navButton('About', 800, 0),
-                _navButton('Skills', 1600, 100),
-                _navButton('Projects', 2400, 200),
-                _navButton('Experience', 3200, 300),
-                _navButton('Contact', 4000, 400),
+                _navButton('About', 800, 0, 0),
+                _navButton('Skills', 1600, 100, 1),
+                _navButton('Projects', 2400, 200, 2),
+                _navButton('Experience', 3200, 300, 3),
+                _navButton('Contact', 4000, 400, 4),
               ],
             ),
           ],
@@ -137,8 +158,10 @@ class _PortfolioHomeState extends State<PortfolioHome>
       ),
     );
   }
+  int selectedIndex = 0; // track selected nav button
 
-  Widget _navButton(String text, double offset, int delay) {
+  Widget _navButton(String text, double offset, int delay, int index) {
+    bool isSelected = selectedIndex == index;
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.0, end: 1.0),
       duration: Duration(milliseconds: 800 + delay),
@@ -153,21 +176,37 @@ class _PortfolioHomeState extends State<PortfolioHome>
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15),
-        child: TextButton(
-          onPressed: () => _scrollToSection(offset),
-          child: Text(
-            text,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
+        child: GestureDetector(
+          onTap: () {
+            setState(() {
+              selectedIndex = index; // update selected index
+            });
+            _scrollToSection(offset); // scroll to section
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                text,
+                style: TextStyle(
+                  color: isSelected ? const Color(0xFF64ffda) : Colors.white70,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 4),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                height: 2,
+                width: isSelected ? 20 : 0,
+                color: const Color(0xFF64ffda),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
-
   Widget _buildHeroSection() {
     return Container(
       height: 700,
@@ -283,23 +322,30 @@ class _PortfolioHomeState extends State<PortfolioHome>
                 opacity: _fadeController,
                 child: SlideTransition(
                   position:
-                  Tween<Offset>(
-                    begin: const Offset(-0.5, 0),
-                    end: Offset.zero,
-                  ).animate(
-                    CurvedAnimation(
-                      parent: _heroAnimController,
-                      curve: Interval(0.5, 1.0, curve: Curves.easeOut),
-                    ),
-                  ),
+                      Tween<Offset>(
+                        begin: const Offset(-0.5, 0),
+                        end: Offset.zero,
+                      ).animate(
+                        CurvedAnimation(
+                          parent: _heroAnimController,
+                          curve: Interval(0.5, 1.0, curve: Curves.easeOut),
+                        ),
+                      ),
                   child: ElevatedButton(
-                    onPressed: (){
-                      launchUrl(Uri.parse('https://drive.google.com/file/d/1NbHG6nyYbZBZ2LgJou0fy1Ztxpml6Mje/view?usp=sharing'));
+                    onPressed: () {
+                      launchUrl(
+                        Uri.parse(
+                          'https://drive.google.com/file/d/1NbHG6nyYbZBZ2LgJou0fy1Ztxpml6Mje/view?usp=sharing',
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
                       foregroundColor: const Color(0xFF64ffda),
-                      side: const BorderSide(color: Color(0xFF64ffda), width: 2),
+                      side: const BorderSide(
+                        color: Color(0xFF64ffda),
+                        width: 2,
+                      ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 40,
                         vertical: 20,
@@ -313,16 +359,22 @@ class _PortfolioHomeState extends State<PortfolioHome>
                       children: [
                         const Text(
                           'View CV',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                        SizedBox(width: 20,),
-                        Icon(Icons.arrow_forward_ios_rounded, color:const Color(0xFF64ffda) ,)
+                        SizedBox(width: 20),
+                        Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          color: const Color(0xFF64ffda),
+                        ),
                       ],
                     ),
                   ),
                 ),
               ),
-              SizedBox(width: 30,),
+              SizedBox(width: 30),
               FadeTransition(
                 opacity: _fadeController,
                 child: SlideTransition(
@@ -341,7 +393,10 @@ class _PortfolioHomeState extends State<PortfolioHome>
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
                       foregroundColor: const Color(0xFF64ffda),
-                      side: const BorderSide(color: Color(0xFF64ffda), width: 2),
+                      side: const BorderSide(
+                        color: Color(0xFF64ffda),
+                        width: 2,
+                      ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 40,
                         vertical: 20,
@@ -352,7 +407,10 @@ class _PortfolioHomeState extends State<PortfolioHome>
                     ),
                     child: const Text(
                       'Get In Touch',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ),
@@ -420,7 +478,6 @@ class _PortfolioHomeState extends State<PortfolioHome>
                 },
                 child: Container(
                   clipBehavior: Clip.antiAlias,
-                  padding: EdgeInsets.all(15),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
@@ -428,7 +485,7 @@ class _PortfolioHomeState extends State<PortfolioHome>
                       width: 2,
                     ),
                   ),
-                  child: Image.asset(Assets.imagesMyImage),
+                  child: Image.asset(Assets.imagesMyImage, fit: BoxFit.fill),
                 ),
               ),
             ),
@@ -787,20 +844,20 @@ class _PortfolioHomeState extends State<PortfolioHome>
                 children: [
                   _socialIcon(Assets.imagesGithub, 0, () {
                     launchUrl(Uri.parse('https://github.com/maherade'));
-                  },Colors.white),
+                  }, Colors.white),
                   _socialIcon(Assets.imagesLinkedin, 100, () {
                     launchUrl(
                       Uri.parse(
                         'https://www.linkedin.com/in/maher-adel-234722191/',
                       ),
                     );
-                  },Colors.white),
+                  }, Colors.white),
                   _socialIcon(Assets.imagesMail, 200, () {
                     launchUrl(Uri.parse('mailto:maheradel451@gmail.com'));
-                  },Colors.white),
+                  }, Colors.white),
                   _socialIcon(Assets.imagesTelephone, 300, () {
                     launchUrl(Uri.parse('tel:+201554583937'));
-                  },Colors.white),
+                  }, Colors.white),
                 ],
               ),
               const SizedBox(height: 30),
@@ -815,7 +872,12 @@ class _PortfolioHomeState extends State<PortfolioHome>
     );
   }
 
-  Widget _socialIcon(String icon, int delay, void Function()? onTap,Color color) {
+  Widget _socialIcon(
+    String icon,
+    int delay,
+    void Function()? onTap,
+    Color color,
+  ) {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.0, end: 1.0),
       duration: Duration(milliseconds: 800 + delay),

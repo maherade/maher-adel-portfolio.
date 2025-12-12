@@ -2,12 +2,13 @@
 class Assets {
   Assets._();
 
+  static const String assetsImagesMyImage = 'assets/images/my_image.jpeg';
   static const String imagesAppStore = 'assets/images/app_store.png';
   static const String imagesGithub = 'assets/images/github.png';
   static const String imagesGooglePlay = 'assets/images/google_play.png';
   static const String imagesLinkedin = 'assets/images/linkedin.png';
   static const String imagesMail = 'assets/images/mail.png';
-  static const String imagesMyImage = 'assets/images/my_image.jpeg';
+  static const String imagesMyImage = 'assets/images/my_image.png';
   static const String imagesTelephone = 'assets/images/telephone.png';
 
 }
