@@ -1,0 +1,90 @@
+mutation PopulateDatabaseWithSeedData @transaction @auth(level: NO_ACCESS) {
+  user_insertMany(
+    data: [
+      {
+        id: "550e8400-e29b-41d4-a716-446655440000"
+        name: "Demo User 1"
+        email: "demo1@example.com"
+        createdAt: "2024-01-01T00:00:00Z"
+      }
+      {
+        id: "550e8400-e29b-41d4-a716-446655440001"
+        name: "Demo User 2"
+        email: "demo2@example.com"
+        createdAt: "2024-01-02T00:00:00Z"
+      }
+    ]
+  )
+  skill_insertMany(
+    data: [
+      {
+        id: "650e8400-e29b-41d4-a716-446655440000"
+        userId: "550e8400-e29b-41d4-a716-446655440000"
+        name: "JavaScript"
+        proficiency: "Expert"
+      }
+      {
+        id: "650e8400-e29b-41d4-a716-446655440001"
+        userId: "550e8400-e29b-41d4-a716-446655440001"
+        name: "Python"
+        proficiency: "Intermediate"
+      }
+    ]
+  )
+  project_insertMany(
+    data: [
+      {
+        id: "750e8400-e29b-41d4-a716-446655440000"
+        userId: "550e8400-e29b-41d4-a716-446655440000"
+        title: "Project 1"
+        description: "Description for project 1"
+        createdAt: "2024-01-03T00:00:00Z"
+      }
+      {
+        id: "750e8400-e29b-41d4-a716-446655440001"
+        userId: "550e8400-e29b-41d4-a716-446655440001"
+        title: "Project 2"
+        description: "Description for project 2"
+        createdAt: "2024-01-04T00:00:00Z"
+      }
+    ]
+  )
+  projectMedia_insertMany(
+    data: [
+      {
+        id: "850e8400-e29b-41d4-a716-446655440000"
+        projectId: "750e8400-e29b-41d4-a716-446655440000"
+        mediaType: "image"
+        mediaUrl: "http://example.com/image1.jpg"
+        order: 1
+      }
+      {
+        id: "850e8400-e29b-41d4-a716-446655440001"
+        projectId: "750e8400-e29b-41d4-a716-446655440001"
+        mediaType: "video"
+        mediaUrl: "http://example.com/video1.mp4"
+        order: 1
+      }
+    ]
+  )
+  experience_insertMany(
+    data: [
+      {
+        id: "950e8400-e29b-41d4-a716-446655440000"
+        userId: "550e8400-e29b-41d4-a716-446655440000"
+        title: "Job 1"
+        organization: "Company 1"
+        type: "Full-time"
+        startDate: "2023-01-01"
+      }
+      {
+        id: "950e8400-e29b-41d4-a716-446655440001"
+        userId: "550e8400-e29b-41d4-a716-446655440001"
+        title: "Job 2"
+        organization: "Company 2"
+        type: "Part-time"
+        startDate: "2023-02-01"
+      }
+    ]
+  )
+}

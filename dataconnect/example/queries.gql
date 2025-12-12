@@ -1,0 +1,33 @@
+mutation CreateUser @auth(level: USER, insecureReason: "This operation is safe to expose to all logged in users.") {
+  user_insert(data: {
+    id_expr: "uuidV4()",
+    email: "newuser@example.com",
+    name: "New User",
+    createdAt_expr: "request.time"
+  })
+}
+
+query ListProjects @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public") {
+  projects {
+    id
+    title
+    description
+  }
+}
+
+mutation UpdateProject($id: UUID!, $description: String) @auth(level: USER, insecureReason: "This operation is safe to expose to all logged in users.") {
+  project_update(
+    id: $id,
+    data: {
+      description: $description
+    }
+  )
+}
+
+query GetSkillsByUser($userId: UUID!) @auth(level: USER, insecureReason: "This operation is safe to expose to all logged in users.") {
+  skills(where: {userId: {eq: $userId}}) {
+    id
+    name
+    proficiency
+  }
+}
