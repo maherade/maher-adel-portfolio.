@@ -75,6 +75,7 @@ class _PortfolioHomeState extends State<PortfolioHome>
     });
   }
 
+
   void _scrollToSection(double offset) {
     _scrollController.animateTo(
       offset,
