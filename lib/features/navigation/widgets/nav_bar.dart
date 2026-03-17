@@ -158,8 +158,19 @@ class _Logo extends StatelessWidget {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: cs.accent,
-              borderRadius: BorderRadius.circular(7),
+              gradient: LinearGradient(
+                colors: [cs.accent, cs.accentLight],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                  color: cs.accent.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             alignment: Alignment.center,
             child: const Text(
@@ -168,7 +179,7 @@ class _Logo extends StatelessWidget {
                 color: Colors.white,
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
-                letterSpacing: 0.3,
+                letterSpacing: 0.5,
               ),
             ),
           ),
