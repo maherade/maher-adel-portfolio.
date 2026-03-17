@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:unping_task/app/theme/app_theme.dart';
 import 'package:unping_task/core/providers/theme_provider.dart';
 import 'package:unping_task/features/home/home_page.dart';
+import 'package:unping_task/features/loading/loading_page.dart';
 
 class PortfolioApp extends StatefulWidget {
   const PortfolioApp({super.key});
@@ -12,6 +13,7 @@ class PortfolioApp extends StatefulWidget {
 
 class _PortfolioAppState extends State<PortfolioApp> {
   ThemeMode _themeMode = ThemeMode.dark;
+  bool _isLoading = true;
 
   void _toggleTheme() {
     setState(() {
@@ -32,7 +34,17 @@ class _PortfolioAppState extends State<PortfolioApp> {
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: _themeMode,
-        home: const HomePage(),
+        home: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 800),
+          switchInCurve: Curves.easeInOut,
+          switchOutCurve: Curves.easeInOut,
+          child: _isLoading
+              ? LoadingPage(
+                  key: const ValueKey('loading'),
+                  onComplete: () => setState(() => _isLoading = false),
+                )
+              : const HomePage(key: ValueKey('home')),
+        ),
       ),
     );
   }
