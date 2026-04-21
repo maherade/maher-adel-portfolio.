@@ -3,12 +3,19 @@ class Assets {
   Assets._();
 
   static const String filesMaherAdelCv = 'assets/files/maher_adel_cv.pdf';
+  static const String filesMaherAdelFlutter = 'assets/files/maher_adel_flutter.pdf';
+  static const String imagesAppIcon = 'assets/images/app_icon.png';
   static const String imagesAppStore = 'assets/images/app_store.png';
+  static const String imagesBwwIcon = 'assets/images/bww_icon.webp';
+  static const String imagesGenieptImage = 'assets/images/geniept_image.webp';
   static const String imagesGithub = 'assets/images/github.png';
   static const String imagesGooglePlay = 'assets/images/google_play.png';
   static const String imagesLinkedin = 'assets/images/linkedin.png';
   static const String imagesMail = 'assets/images/mail.png';
   static const String imagesMyImage = 'assets/images/my_image.jpeg';
+  static const String imagesNafahat = 'assets/images/nafahat.webp';
+  static const String imagesSaytaraImage = 'assets/images/saytara_image.webp';
   static const String imagesTelephone = 'assets/images/telephone.png';
+  static const String imagesUfeedLogo = 'assets/images/ufeed_logo.png';
 
 }

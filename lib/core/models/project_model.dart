@@ -7,6 +7,7 @@ class ProjectModel {
   final String? playStoreUrl;
   final String? appStoreUrl;
   final String? webUrl;
+  final String? coverImage;
 
   const ProjectModel({
     required this.title,
@@ -17,5 +18,6 @@ class ProjectModel {
     this.playStoreUrl,
     this.appStoreUrl,
     this.webUrl,
+    this.coverImage,
   });
 }

@@ -45,6 +45,19 @@ class _ProjectCardState extends State<ProjectCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // if (widget.project.coverImage != null)
+              //   ClipRRect(
+              //     borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+              //     child: AspectRatio(
+              //       aspectRatio: 16 / 9,
+              //       child:Image.asset(
+              //               widget.project.coverImage!,
+              //               fit: BoxFit.contain,
+              //               errorBuilder: (context, error, stackTrace) =>
+              //                   Container(color: cs.surfaceElevated),
+              //             ),
+              //     ),
+              //   ),
               _CardTop(cs: cs, project: widget.project, isHovered: _hovered),
               Padding(
                 padding: const EdgeInsets.fromLTRB(22, 0, 22, 22),

@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:unping_task/core/constants/app_colors.dart';
 import 'package:unping_task/core/utils/cv_download.dart';
@@ -242,69 +243,205 @@ class _HeroText extends StatelessWidget {
 // Profile image card (moved from About)
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _ProfileImage extends StatelessWidget {
+class _ProfileImage extends StatefulWidget {
   final AppColors cs;
   const _ProfileImage({required this.cs});
 
   @override
+  State<_ProfileImage> createState() => _ProfileImageState();
+}
+
+class _ProfileImageState extends State<_ProfileImage> with SingleTickerProviderStateMixin {
+  late AnimationController _animController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 15),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final mobile = AppResponsive.isMobile(context);
+    final double imageSize = mobile ? 280 : 360;
+    // Fixed distance from the center
+    final double orbitRadius = (imageSize / 2) + (mobile ? 25 : 40);
+
     return Center(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: mobile ? 280 : 360),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: Stack(
-            children: [
-              Image.asset(
-                Assets.imagesMyImage,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-              // Gradient name tag at the bottom
-              // Positioned(
-              //   bottom: 0,
-              //   left: 0,
-              //   right: 0,
-              //   child: Container(
-              //     padding: const EdgeInsets.all(20),
-              //     decoration: BoxDecoration(
-              //       gradient: LinearGradient(
-              //         begin: Alignment.bottomCenter,
-              //         end: Alignment.topCenter,
-              //         colors: [
-              //           Colors.black.withValues(alpha: 0.8),
-              //           Colors.transparent,
-              //         ],
-              //       ),
-              //     ),
-              //     child: Column(
-              //       crossAxisAlignment: CrossAxisAlignment.start,
-              //       children: [
-              //         const Text(
-              //           'Maher Adel',
-              //           style: TextStyle(
-              //             color: Colors.white,
-              //             fontSize: 18,
-              //             fontWeight: FontWeight.w700,
-              //           ),
-              //         ),
-              //         const SizedBox(height: 2),
-              //         Text(
-              //           'Flutter Developer',
-              //           style: TextStyle(
-              //             color: cs.accentLight,
-              //             fontSize: 13,
-              //             fontWeight: FontWeight.w500,
-              //           ),
-              //         ),
-              //       ],
-              //     ),
-              //   ),
-              // ),
-            ],
+      child: Transform.translate(
+        offset: Offset(mobile ? 0 : -40, 0),
+        child: SizedBox(
+          width: imageSize + 140, // accommodate icons width and padding
+          height: imageSize + 140,
+          child: AnimatedBuilder(
+            animation: _animController,
+            builder: (context, child) {
+              final sineValue = math.sin(_animController.value * 2 * math.pi * 3);
+              final floatOffset = sineValue * 12;
+              // Normalized pulse from 0.0 to 1.0 based on the animation sine wave
+              final pulse = (sineValue + 1) / 2;
+
+              return Stack(
+                alignment: Alignment.center,
+                clipBehavior: Clip.none,
+                children: [
+                  // Inner image, floats and breathes organically with modern glow
+                  Transform.translate(
+                    offset: Offset(0, floatOffset),
+                    child: Container(
+                      width: imageSize,
+                      height: imageSize,
+                      padding: const EdgeInsets.all(6), // Transparent gap between outer rim and image
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        // Glowing rim light
+                        border: Border.all(
+                          color: widget.cs.accentWithOpacity(0.15 + (pulse * 0.2)),
+                          width: 2,
+                        ),
+                        boxShadow: [
+                          // Wide, gentle diffused glow that expands and breathes
+                          BoxShadow(
+                            color: widget.cs.accentWithOpacity(0.1 + (pulse * 0.1)),
+                            blurRadius: 40 + (pulse * 20),
+                            spreadRadius: 8 + (pulse * 4),
+                          ),
+                          // Sharper, tighter inner highlight
+                          BoxShadow(
+                            color: widget.cs.accentWithOpacity(0.15 + (pulse * 0.15)),
+                            blurRadius: 15 + (pulse * 5),
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          // Secondary thick inner border masking the clip
+                          border: Border.all(
+                            color: widget.cs.surfaceElevated,
+                            width: 4,
+                          ),
+                        ),
+                        child: ClipOval(
+                          child: Image.asset(Assets.imagesMyImage, fit: BoxFit.cover),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Static Icons with bobbing effect
+                  ...List.generate(5, (index) {
+                    final angles = [
+                      math.pi * 1.25, // Top Left
+                      math.pi * 1.75, // Top Right
+                      math.pi * 0.1,  // Middle Right
+                      math.pi * 0.9,  // Middle Left
+                      math.pi * 0.6,  // Bottom Mid-Right
+                    ];
+                    final angle = angles[index];
+                    final dx = orbitRadius * math.cos(angle);
+                    final baseDy = orbitRadius * math.sin(angle);
+                    
+                    // Phase shifted bobbing effect for each icon
+                    final iconFloat = math.sin((_animController.value * 2 * math.pi * 3) + (index * 1.5)) * 8;
+
+                    return Transform.translate(
+                      offset: Offset(dx, baseDy + iconFloat),
+                      child: _OrbitIcon(index: index, cs: widget.cs),
+                    );
+                  }),
+                ],
+              );
+            },
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _OrbitIcon extends StatelessWidget {
+  final int index;
+  final AppColors cs;
+
+  const _OrbitIcon({required this.index, required this.cs});
+
+  @override
+  Widget build(BuildContext context) {
+    String? imageUrl;
+    IconData? fallbackIcon;
+
+    switch (index) {
+      case 0:
+        imageUrl = 'https://raw.githubusercontent.com/github/explore/master/topics/flutter/flutter.png';
+        break;
+      case 1:
+        fallbackIcon = Icons.apple; // Apple logo natively handles dark/light theme
+        break;
+      case 2:
+        imageUrl = 'https://raw.githubusercontent.com/github/explore/master/topics/android/android.png';
+        break;
+      case 3:
+        imageUrl = 'https://raw.githubusercontent.com/github/explore/master/topics/firebase/firebase.png';
+        break;
+      case 4:
+      default:
+        imageUrl = 'https://raw.githubusercontent.com/github/explore/master/topics/dart/dart.png';
+        break;
+    }
+
+    final isAccent = index % 2 == 0;
+
+    return Container(
+      width: 58,
+      height: 58,
+      decoration: BoxDecoration(
+        color: cs.surfaceElevated,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: cs.accentWithOpacity(0.12),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+            spreadRadius: -4,
+          ),
+        ],
+        border: Border.all(
+          color: cs.border.withOpacity(0.6), 
+          width: 1,
+        ),
+      ),
+      child: Center(
+        child: imageUrl != null
+            ? Image.network(
+                imageUrl,
+                width: 32,
+                height: 32,
+                fit: BoxFit.contain,
+              )
+            : ShaderMask(
+                shaderCallback: (bounds) => LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isAccent
+                      ? [cs.accentLight, cs.accent]
+                      : [cs.textPrimary, cs.textSecondary],
+                ).createShader(bounds),
+                child: Icon(
+                  fallbackIcon,
+                  color: Colors.white,
+                  size: 30,
+                ),
+              ),
       ),
     );
   }
@@ -366,7 +503,7 @@ class _StatusBadge extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Text(
-          'Available for new projects',
+          'Available for new opportunity',
           style: TextStyle(
             color: cs.textSecondary,
             fontSize: 14,
@@ -422,7 +559,7 @@ class _HeroHeading extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: 16,),
+        SizedBox(height: 16),
         Text(
           'Flutter Developer',
           style: TextStyle(

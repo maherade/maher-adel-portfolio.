@@ -82,8 +82,8 @@ class _AboutBody extends StatelessWidget {
       children: [
         Text(
           "Hello! I'm Maher, a Mobile Developer specializing in Flutter. I focus on "
-              "building high-quality cross-platform applications that combine strong "
-              "performance with intuitive and engaging user experiences.",
+          "building high-quality cross-platform applications that combine strong "
+          "performance with intuitive and engaging user experiences.",
           style: TextStyle(
             color: cs.textSecondary,
             fontSize: AppResponsive.bodySize(context),
@@ -93,9 +93,9 @@ class _AboutBody extends StatelessWidget {
         const SizedBox(height: 14),
         Text(
           "I place strong emphasis on clean architecture, maintainable code, and "
-              "scalable solutions. My work includes integrating modern technologies, "
-              "developing real-time features, and building complex platforms such as "
-              "multi-vendor systems while maintaining high standards of quality and performance.",
+          "scalable solutions. My work includes integrating modern technologies, "
+          "developing real-time features, and building complex platforms such as "
+          "multi-vendor systems while maintaining high standards of quality and performance.",
           style: TextStyle(
             color: cs.textSecondary,
             fontSize: AppResponsive.bodySize(context),
