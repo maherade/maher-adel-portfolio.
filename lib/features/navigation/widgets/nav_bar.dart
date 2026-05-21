@@ -5,15 +5,15 @@ import 'package:unping_task/core/utils/responsive.dart';
 
 class NavBar extends StatefulWidget {
   final int selectedIndex;
-  final void Function(double offset, int index) onNavTap;
+  final void Function(int index) onNavTap;
   final ValueNotifier<double> scrollOffset;
 
   static const navItems = [
-    NavItem(label: 'About', offset: 0, index: 0),
-    NavItem(label: 'Skills', offset: 1100, index: 1),
-    NavItem(label: 'Experience', offset: 2000, index: 2),
-    NavItem(label: 'Projects', offset: 3100, index: 3),
-    NavItem(label: 'Contact', offset: 4200, index: 4),
+    NavItem(label: 'About', index: 0),
+    NavItem(label: 'Skills', index: 1),
+    NavItem(label: 'Experience', index: 2),
+    NavItem(label: 'Projects', index: 3),
+    NavItem(label: 'Contact', index: 4),
   ];
 
   const NavBar({
@@ -103,7 +103,7 @@ class _NavBarState extends State<NavBar> {
                       label: item.label,
                       isSelected: widget.selectedIndex == item.index,
                       delay: item.index * 80,
-                      onTap: () => widget.onNavTap(item.offset, item.index),
+                      onTap: () => widget.onNavTap(item.index),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -123,11 +123,9 @@ class _NavBarState extends State<NavBar> {
 
 class NavItem {
   final String label;
-  final double offset;
   final int index;
   const NavItem({
     required this.label,
-    required this.offset,
     required this.index,
   });
 }

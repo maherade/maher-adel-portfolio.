@@ -273,15 +273,13 @@ class _ProfileImageState extends State<_ProfileImage> with SingleTickerProviderS
   Widget build(BuildContext context) {
     final mobile = AppResponsive.isMobile(context);
     final double imageSize = mobile ? 280 : 360;
-    // Fixed distance from the center
-    final double orbitRadius = (imageSize / 2) + (mobile ? 25 : 40);
 
     return Center(
       child: Transform.translate(
         offset: Offset(mobile ? 0 : -40, 0),
         child: SizedBox(
-          width: imageSize + 140, // accommodate icons width and padding
-          height: imageSize + 140,
+          width: imageSize,
+          height: imageSize,
           child: AnimatedBuilder(
             animation: _animController,
             builder: (context, child) {
@@ -338,110 +336,11 @@ class _ProfileImageState extends State<_ProfileImage> with SingleTickerProviderS
                       ),
                     ),
                   ),
-                  // Static Icons with bobbing effect
-                  ...List.generate(5, (index) {
-                    final angles = [
-                      math.pi * 1.25, // Top Left
-                      math.pi * 1.75, // Top Right
-                      math.pi * 0.1,  // Middle Right
-                      math.pi * 0.9,  // Middle Left
-                      math.pi * 0.6,  // Bottom Mid-Right
-                    ];
-                    final angle = angles[index];
-                    final dx = orbitRadius * math.cos(angle);
-                    final baseDy = orbitRadius * math.sin(angle);
-                    
-                    // Phase shifted bobbing effect for each icon
-                    final iconFloat = math.sin((_animController.value * 2 * math.pi * 3) + (index * 1.5)) * 8;
-
-                    return Transform.translate(
-                      offset: Offset(dx, baseDy + iconFloat),
-                      child: _OrbitIcon(index: index, cs: widget.cs),
-                    );
-                  }),
                 ],
               );
             },
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _OrbitIcon extends StatelessWidget {
-  final int index;
-  final AppColors cs;
-
-  const _OrbitIcon({required this.index, required this.cs});
-
-  @override
-  Widget build(BuildContext context) {
-    String? imageUrl;
-    IconData? fallbackIcon;
-
-    switch (index) {
-      case 0:
-        imageUrl = 'https://raw.githubusercontent.com/github/explore/master/topics/flutter/flutter.png';
-        break;
-      case 1:
-        fallbackIcon = Icons.apple; // Apple logo natively handles dark/light theme
-        break;
-      case 2:
-        imageUrl = 'https://raw.githubusercontent.com/github/explore/master/topics/android/android.png';
-        break;
-      case 3:
-        imageUrl = 'https://raw.githubusercontent.com/github/explore/master/topics/firebase/firebase.png';
-        break;
-      case 4:
-      default:
-        imageUrl = 'https://raw.githubusercontent.com/github/explore/master/topics/dart/dart.png';
-        break;
-    }
-
-    final isAccent = index % 2 == 0;
-
-    return Container(
-      width: 58,
-      height: 58,
-      decoration: BoxDecoration(
-        color: cs.surfaceElevated,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: cs.accentWithOpacity(0.12),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-            spreadRadius: -4,
-          ),
-        ],
-        border: Border.all(
-          color: cs.border.withOpacity(0.6), 
-          width: 1,
-        ),
-      ),
-      child: Center(
-        child: imageUrl != null
-            ? Image.network(
-                imageUrl,
-                width: 32,
-                height: 32,
-                fit: BoxFit.contain,
-              )
-            : ShaderMask(
-                shaderCallback: (bounds) => LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: isAccent
-                      ? [cs.accentLight, cs.accent]
-                      : [cs.textPrimary, cs.textSecondary],
-                ).createShader(bounds),
-                child: Icon(
-                  fallbackIcon,
-                  color: Colors.white,
-                  size: 30,
-                ),
-              ),
       ),
     );
   }

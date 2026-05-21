@@ -4,7 +4,7 @@ import 'package:unping_task/features/navigation/widgets/nav_bar.dart';
 
 class NavDrawer extends StatelessWidget {
   final int selectedIndex;
-  final void Function(double, int) onNavTap;
+  final void Function(int index) onNavTap;
 
   const NavDrawer({
     super.key,
@@ -77,7 +77,7 @@ class NavDrawer extends StatelessWidget {
                 // trailing: selectedIndex == item.index
                 //     ? Icon(Icons.circle, size: 8, color: cs.accent)
                 //     : null,
-                onTap: () => onNavTap(item.offset, item.index),
+                onTap: () => onNavTap(item.index),
               ),
             ),
           ],

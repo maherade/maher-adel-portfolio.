@@ -19,13 +19,19 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<double> _scrollOffset = ValueNotifier(0);
+  final GlobalKey aboutSectionKey = GlobalKey();
+  final GlobalKey skillsSectionKey = GlobalKey();
+  final GlobalKey experienceSectionKey = GlobalKey();
+  final GlobalKey projectsSectionKey = GlobalKey();
+  final GlobalKey contactSectionKey = GlobalKey();
 
   late AnimationController _heroAnimController;
   late AnimationController _fadeController;
+  late final List<GlobalKey> sectionKeys;
 
   int _selectedIndex = 0;
 
-  static const _sectionOffsets = <double>[0, 1100, 2000, 3100, 4200, 5000];
+  static const double _navScrollPadding = 88;
 
   @override
   void initState() {
@@ -41,6 +47,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 800),
     )..forward();
 
+    sectionKeys = [
+      aboutSectionKey,
+      skillsSectionKey,
+      experienceSectionKey,
+      projectsSectionKey,
+      contactSectionKey,
+    ];
+
     _scrollController.addListener(_onScroll);
   }
 
@@ -48,32 +62,73 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     final scrollPos = _scrollController.offset;
     _scrollOffset.value = scrollPos;
 
-    for (int i = 0; i < _sectionOffsets.length; i++) {
-      final start = _sectionOffsets[i];
-      final end = (i + 1 < _sectionOffsets.length)
-          ? _sectionOffsets[i + 1]
-          : double.infinity;
+    int activeIndex = _selectedIndex;
+    final isAtBottom =
+        _scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 2;
 
-      if (scrollPos >= start && scrollPos < end) {
-        if (_selectedIndex != i) {
-          setState(() => _selectedIndex = i);
+    if (isAtBottom) {
+      activeIndex = sectionKeys.length - 1;
+    } else {
+      for (int i = 0; i < sectionKeys.length; i++) {
+        final sectionContext = sectionKeys[i].currentContext;
+        if (sectionContext == null) {
+          continue;
         }
-        break;
+
+        final renderBox = sectionContext.findRenderObject() as RenderBox?;
+        if (renderBox == null || !renderBox.attached) {
+          continue;
+        }
+
+        final sectionTop = renderBox.localToGlobal(Offset.zero).dy;
+        if (sectionTop <= _navScrollPadding + 24) {
+          activeIndex = i;
+        }
       }
+    }
+
+    if (_selectedIndex != activeIndex) {
+      setState(() => _selectedIndex = activeIndex);
     }
   }
 
-  void _scrollToSection(double offset) {
+  void _scrollToSection(int index) {
+    if (!_scrollController.hasClients ||
+        index < 0 ||
+        index >= sectionKeys.length) {
+      return;
+    }
+
+    final sectionContext = sectionKeys[index].currentContext;
+    if (sectionContext == null) {
+      return;
+    }
+
+    final renderBox = sectionContext.findRenderObject() as RenderBox?;
+    if (renderBox == null || !renderBox.attached) {
+      return;
+    }
+
+    final targetOffset =
+        _scrollController.offset +
+        renderBox.localToGlobal(Offset.zero).dy -
+        _navScrollPadding;
+    final clampedOffset = targetOffset.clamp(
+      0.0,
+      _scrollController.position.maxScrollExtent,
+    );
+
     _scrollController.animateTo(
-      offset,
+      clampedOffset,
       duration: const Duration(milliseconds: 800),
       curve: Curves.easeInOut,
     );
   }
 
-  void _onNavTap(double offset, int index) {
+  void _onNavTap(int index) {
     setState(() => _selectedIndex = index);
-    _scrollToSection(offset);
+    _scrollToSection(index);
   }
 
   @override
@@ -93,8 +148,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         // ── Right-side drawer for mobile navigation ──────────────────────────
         endDrawer: NavDrawer(
           selectedIndex: _selectedIndex,
-          onNavTap: (offset, index) {
-            _onNavTap(offset, index);
+          onNavTap: (index) {
+            _onNavTap(index);
             Navigator.pop(context); // close drawer
           },
         ),
@@ -107,13 +162,28 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   HeroSection(
                     heroAnimController: _heroAnimController,
                     fadeController: _fadeController,
-                    onGetInTouch: () => _scrollToSection(4000),
+                    onGetInTouch: () => _scrollToSection(4),
                   ),
-                  const AboutSection(),
-                  const SkillsSection(),
-                  const ExperienceSection(),
-                  const ProjectsSection(),
-                  const ContactSection(),
+                  KeyedSubtree(
+                    key: aboutSectionKey,
+                    child: const AboutSection(),
+                  ),
+                  KeyedSubtree(
+                    key: skillsSectionKey,
+                    child: const SkillsSection(),
+                  ),
+                  KeyedSubtree(
+                    key: experienceSectionKey,
+                    child: const ExperienceSection(),
+                  ),
+                  KeyedSubtree(
+                    key: projectsSectionKey,
+                    child: const ProjectsSection(),
+                  ),
+                  KeyedSubtree(
+                    key: contactSectionKey,
+                    child: const ContactSection(),
+                  ),
                 ],
               ),
             ),
